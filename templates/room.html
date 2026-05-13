@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}在线白板 - {{ room.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/whiteboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="whiteboard-page">
+    <!-- 顶部栏 -->
+    <div class="wb-header">
+        <div class="wb-header-left">
+            <a href="/" class="back-btn">← 返回</a>
+            <span class="room-name">{{ room.name }}</span>
+            <span class="room-id">ID: {{ room.id }}</span>
+        </div>
+        <div class="wb-header-center">
+            <span class="online-count" id="online-count">🟢 1人在线</span>
+        </div>
+        <div class="wb-header-right">
+            <button onclick="copyLink()" class="btn btn-outline btn-sm">🔗 复制链接</button>
+            {% if user %}
+            <button onclick="saveSnapshot()" class="btn btn-primary btn-sm">💾 保存</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="wb-body">
+        <!-- 左侧工具栏 -->
+        <div class="toolbar" id="toolbar">
+            <button class="tool-btn active" data-tool="pen" title="画笔">✏️</button>
+            <button class="tool-btn" data-tool="eraser" title="橡皮擦">🧹</button>
+            <button class="tool-btn" data-tool="spray" title="喷枪">🎨</button>
+            <button class="tool-btn" data-tool="calligraphy" title="书法笔">🖌️</button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="line" title="直线">📏</button>
+            <button class="tool-btn" data-tool="rect" title="矩形">⬜</button>
+            <button class="tool-btn" data-tool="filled_rect" title="实心矩形">🟦</button>
+            <button class="tool-btn" data-tool="circle" title="圆形">⭕</button>
+            <button class="tool-btn" data-tool="filled_circle" title="实心圆形">🔵</button>
+            <button class="tool-btn" data-tool="filled_triangle" title="实心三角形">🔺</button>
+            <button class="tool-btn" data-tool="text" title="文本">📝</button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="select" title="选择">👆</button>
+            <div class="toolbar-divider"></div>
+            <div class="color-picker">
+                <div class="color-presets">
+                    <button class="color-btn active" data-color="#000000" style="background:#000000"></button>
+                    <button class="color-btn" data-color="#FF0000" style="background:#FF0000"></button>
+                    <button class="color-btn" data-color="#0000FF" style="background:#0000FF"></button>
+                    <button class="color-btn" data-color="#00AA00" style="background:#00AA00"></button>
+                    <button class="color-btn" data-color="#FF6600" style="background:#FF6600"></button>
+                    <button class="color-btn" data-color="#9900CC" style="background:#9900CC"></button>
+                    <button class="color-btn" data-color="#FFCC00" style="background:#FFCC00"></button>
+                    <button class="color-btn" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ccc"></button>
+                </div>
+                <input type="color" id="custom-color" value="#000000" title="自定义颜色">
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="width-control">
+                <label>粗细</label>
+                <input type="range" id="line-width" min="1" max="20" value="2">
+                <span id="width-value">2</span>
+            </div>
+        </div>
+
+        <!-- Canvas 白板 -->
+        <div class="canvas-container" id="canvas-container">
+            <canvas id="main-canvas"></canvas>
+            <canvas id="preview-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- 右下角撤销/重做 -->
+    <div class="undo-redo-bar">
+        <button class="btn btn-outline btn-sm" onclick="undo()" title="撤销 (Ctrl+Z)">↩️ 撤销</button>
+        <button class="btn btn-outline btn-sm" onclick="redo()" title="重做 (Ctrl+Y)">↪️ 重做</button>
+        <button class="btn btn-outline btn-sm" onclick="wb.batchUndo()" title="批量撤销5步 (Ctrl+Shift+Z)">⏪ 批量撤销</button>
+    </div>
+</div>
+
+<script>
+window.ROOM_ID = '{{ room.id }}';
+window.ROOM_NAME = '{{ room.name }}';
+window.IS_LOGGED_IN = {{ 'true' if user else 'false' }};
+window.NICKNAME = '{{ user.username if user else "访客" }}';
+window.SNAPSHOT = {{ room.snapshot|safe if room.snapshot else 'null' }};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/tools.js', v=5) }}"></script>
+<script src="{{ url_for('static', filename='js/whiteboard.js', v=5) }}"></script>
+<script src="{{ url_for('static', filename='js/socket.js', v=5) }}"></script>
+{% endblock %}

@@ -1,0 +1,340 @@
+/* ========== 白板页面布局 ========== */
+.whiteboard-page {
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 顶部栏 */
+.wb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    height: 48px;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    flex-shrink: 0;
+}
+
+.wb-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.back-btn {
+    color: #4361ee;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.room-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.room-id {
+    font-size: 12px;
+    color: #999;
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.wb-header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.online-count {
+    font-size: 13px;
+    color: #555;
+}
+
+.wb-header-right {
+    display: flex;
+    gap: 8px;
+}
+
+/* 白板主体 */
+.wb-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 左侧工具栏 */
+.toolbar {
+    width: 64px;
+    background: #fff;
+    border-right: 1px solid #e8e8e8;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.tool-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #f5f5f5;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    padding: 0;
+}
+
+.tool-btn:hover {
+    background: #e8e8e8;
+    transform: scale(1.05);
+}
+
+.tool-btn.active {
+    border-color: #4361ee;
+    background: #eef0ff;
+}
+
+.toolbar-divider {
+    width: 36px;
+    height: 1px;
+    background: #e0e0e0;
+    margin: 4px 0;
+}
+
+/* 颜色选择 */
+.color-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.color-presets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+}
+
+.color-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.color-btn:hover {
+    transform: scale(1.15);
+}
+
+.color-btn.active {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #4361ee;
+}
+
+#custom-color {
+    width: 36px;
+    height: 24px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* 线宽控制 */
+.width-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #666;
+}
+
+.width-control label {
+    font-size: 11px;
+}
+
+.width-control input[type="range"] {
+    width: 44px;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    height: 60px;
+}
+
+#width-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Canvas 容器 */
+.canvas-container {
+    flex: 1;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+}
+
+.canvas-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#main-canvas {
+    z-index: 1;
+}
+
+#preview-canvas {
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* 撤销/重做栏 */
+.undo-redo-bar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 50;
+}
+
+/* 批量操作栏 */
+.batch-bar {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: #fff;
+    border: 2px solid #4361ee;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(67, 97, 238, 0.25);
+    z-index: 60;
+    animation: batchBarIn 0.25s ease;
+}
+
+@keyframes batchBarIn {
+    from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+.batch-info {
+    font-size: 13px;
+    color: #4361ee;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* 选择工具光标 */
+.canvas-container.select-mode {
+    cursor: crosshair;
+}
+
+.canvas-container.select-mode.dragging {
+    cursor: grabbing;
+}
+
+/* 远程光标 */
+.remote-cursor {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10;
+    transition: left 0.1s, top 0.1s;
+}
+
+.remote-cursor-icon {
+    width: 16px;
+    height: 16px;
+    background: #4361ee;
+    border-radius: 50%;
+}
+
+.remote-cursor-name {
+    font-size: 11px;
+    color: #fff;
+    background: #4361ee;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-left: 12px;
+    margin-top: -4px;
+}
+
+/* 文本输入弹出框 */
+.text-input-popup {
+    position: absolute;
+    z-index: 20;
+    background: #fff;
+    border: 2px solid #4361ee;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.text-input-popup input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    width: 200px;
+}
+
+.text-input-popup .text-confirm {
+    margin-top: 6px;
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.text-input-popup .text-confirm button {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.text-input-popup .text-confirm .confirm-btn {
+    background: #4361ee;
+    color: #fff;
+}
+
+.text-input-popup .text-confirm .cancel-btn {
+    background: #eee;
+    color: #333;
+}
+
+/* 保存成功提示 */
+.save-toast {
+    position: fixed;
+    top: 72px;
+    right: 20px;
+    padding: 12px 20px;
+    background: #4caf50;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
