@@ -21,15 +21,19 @@ env/
 instance/
 *.db
 
+<<<<<<< HEAD
 # Exports (generated at runtime)
 exports/
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 # Environment variables
 .env
 
 # OS
 .DS_Store
 Thumbs.db
+<<<<<<< HEAD
 desktop.ini
 
 # WorkBuddy
@@ -37,3 +41,8 @@ desktop.ini
 
 # Test
 test_*.py
+=======
+
+# WorkBuddy
+.workbuddy/
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70

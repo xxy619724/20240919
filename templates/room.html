@@ -3,7 +3,11 @@
 {% block title %}在线白板 - {{ room.name }}{% endblock %}
 
 {% block extra_css %}
+<<<<<<< HEAD
 <link rel="stylesheet" href="{{ url_for('static', filename='css/whiteboard.css', v=21) }}">
+=======
+<link rel="stylesheet" href="{{ url_for('static', filename='css/whiteboard.css') }}">
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 {% endblock %}
 
 {% block content %}
@@ -19,6 +23,7 @@
             <span class="online-count" id="online-count">🟢 1人在线</span>
         </div>
         <div class="wb-header-right">
+<<<<<<< HEAD
             <div class="export-dropdown">
                 <button class="btn btn-outline btn-sm export-btn" onclick="toggleExportMenu()">
                     📥 导出
@@ -28,6 +33,8 @@
                     <button onclick="exportAs('jpg')">导出为 JPG</button>
                 </div>
             </div>
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             <button onclick="copyLink()" class="btn btn-outline btn-sm">🔗 复制链接</button>
             {% if user %}
             <button onclick="saveSnapshot()" class="btn btn-primary btn-sm">💾 保存</button>
@@ -39,6 +46,7 @@
         <!-- 左侧工具栏 -->
         <div class="toolbar" id="toolbar">
             <button class="tool-btn active" data-tool="pen" title="画笔">✏️</button>
+<<<<<<< HEAD
             <button class="tool-btn" data-tool="eraser" title="橡皮擦">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
                     <path d="M4 20h16"/>
@@ -87,6 +95,21 @@
                 </div>
                 <button class="zoom-btn" id="zoom-reset-btn" title="重置" style="width:62px;">↺</button>
             </div>
+=======
+            <button class="tool-btn" data-tool="eraser" title="橡皮擦">🧹</button>
+            <button class="tool-btn" data-tool="spray" title="喷枪">🎨</button>
+            <button class="tool-btn" data-tool="calligraphy" title="书法笔">🖌️</button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="line" title="直线">📏</button>
+            <button class="tool-btn" data-tool="rect" title="矩形">⬜</button>
+            <button class="tool-btn" data-tool="filled_rect" title="实心矩形">🟦</button>
+            <button class="tool-btn" data-tool="circle" title="圆形">⭕</button>
+            <button class="tool-btn" data-tool="filled_circle" title="实心圆形">🔵</button>
+            <button class="tool-btn" data-tool="filled_triangle" title="实心三角形">🔺</button>
+            <button class="tool-btn" data-tool="text" title="文本">📝</button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="select" title="选择">👆</button>
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             <div class="toolbar-divider"></div>
             <div class="color-picker">
                 <div class="color-presets">
@@ -109,6 +132,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <!-- 形状选择弹出框 -->
         <div class="shape-dialog" id="shape-panel">
             <div class="shape-dialog-header" id="shape-dialog-header">
@@ -212,11 +236,14 @@
             </div>
         </div>
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         <!-- Canvas 白板 -->
         <div class="canvas-container" id="canvas-container">
             <canvas id="main-canvas"></canvas>
             <canvas id="preview-canvas"></canvas>
         </div>
+<<<<<<< HEAD
 
         <!-- 右键上下文菜单 -->
         <div class="context-menu" id="context-menu">
@@ -268,6 +295,8 @@
                 </div>
             </div>
         </div>
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     </div>
 
     <!-- 右下角撤销/重做 -->
@@ -286,6 +315,7 @@ window.NICKNAME = '{{ user.username if user else "访客" }}';
 window.SNAPSHOT = {{ room.snapshot|safe if room.snapshot else 'null' }};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<<<<<<< HEAD
 <script src="{{ url_for('static', filename='js/tools.js', v=12) }}"></script>
 <script src="{{ url_for('static', filename='js/whiteboard.js', v=20) }}"></script>
 <script src="{{ url_for('static', filename='js/socket.js', v=8) }}"></script>
@@ -554,4 +584,9 @@ document.getElementById('zoom-reset-btn').addEventListener('click', function() {
     });
 })();
 </script>
+=======
+<script src="{{ url_for('static', filename='js/tools.js', v=5) }}"></script>
+<script src="{{ url_for('static', filename='js/whiteboard.js', v=5) }}"></script>
+<script src="{{ url_for('static', filename='js/socket.js', v=5) }}"></script>
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 {% endblock %}

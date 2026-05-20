@@ -5,9 +5,12 @@ from app.utils.helpers import generate_room_id
 from app.auth.routes import api_response, login_required
 from app.socket.handlers import get_online_count
 import json
+<<<<<<< HEAD
 import os
 import base64
 from datetime import datetime
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 
 room_bp = Blueprint('room', __name__)
 
@@ -129,6 +132,7 @@ def save_room(room_id):
     db.session.commit()
 
     return api_response('SUCCESS', '保存成功')
+<<<<<<< HEAD
 
 
 @room_bp.route('/<room_id>/export', methods=['POST'])
@@ -178,3 +182,5 @@ def export_room_image(room_id):
     except Exception as e:
         print(f'[EXPORT] 导出失败: {e}')
         return api_response('EXPORT_ERROR', '图片缓存失败', status=500)
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70

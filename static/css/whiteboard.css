@@ -64,20 +64,31 @@
     display: flex;
     flex: 1;
     overflow: hidden;
+<<<<<<< HEAD
     position: relative;
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 }
 
 /* 左侧工具栏 */
 .toolbar {
+<<<<<<< HEAD
     width: 100px;
     background: #fff;
     border-right: 1px solid #e8e8e8;
     padding: 12px 10px;
+=======
+    width: 64px;
+    background: #fff;
+    border-right: 1px solid #e8e8e8;
+    padding: 12px 8px;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
     overflow-y: auto;
+<<<<<<< HEAD
     overflow-x: hidden;
     flex-shrink: 0;
     position: relative;
@@ -91,6 +102,18 @@
     border-radius: 10px;
     background: #f5f5f5;
     font-size: 22px;
+=======
+    flex-shrink: 0;
+}
+
+.tool-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #f5f5f5;
+    font-size: 18px;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -110,7 +133,11 @@
 }
 
 .toolbar-divider {
+<<<<<<< HEAD
     width: 48px;
+=======
+    width: 36px;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     height: 1px;
     background: #e0e0e0;
     margin: 4px 0;
@@ -126,13 +153,22 @@
 
 .color-presets {
     display: grid;
+<<<<<<< HEAD
     grid-template-columns: repeat(4, 1fr);
+=======
+    grid-template-columns: repeat(2, 1fr);
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     gap: 4px;
 }
 
 .color-btn {
+<<<<<<< HEAD
     width: 18px;
     height: 18px;
+=======
+    width: 20px;
+    height: 20px;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
@@ -149,7 +185,11 @@
 }
 
 #custom-color {
+<<<<<<< HEAD
     width: 44px;
+=======
+    width: 36px;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     height: 24px;
     border: none;
     cursor: pointer;
@@ -171,7 +211,11 @@
 }
 
 .width-control input[type="range"] {
+<<<<<<< HEAD
     width: 54px;
+=======
+    width: 44px;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     writing-mode: vertical-lr;
     direction: rtl;
     height: 60px;
@@ -255,6 +299,7 @@
     cursor: grabbing;
 }
 
+<<<<<<< HEAD
 /* 控制点拖拽时光标由 JS 动态设置 style.cursor */
 .canvas-container.resizing {
     cursor: inherit;
@@ -401,6 +446,8 @@
     pointer-events: auto;
 }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 /* 远程光标 */
 .remote-cursor {
     position: absolute;
@@ -488,6 +535,7 @@
     from { transform: translateX(100px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
 }
+<<<<<<< HEAD
 
 /* 导出下拉菜单 */
 .export-dropdown {
@@ -842,3 +890,5 @@
     border-radius: 4px;
     padding: 3px 2px;
 }
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70

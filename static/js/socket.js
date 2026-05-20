@@ -128,6 +128,7 @@ class SocketManager {
             }
         });
 
+<<<<<<< HEAD
         // ---- 远程批量变换 ----
         this.socket.on('batch_transform', (data) => {
             if (data.user_id === this.mySid) return;
@@ -136,6 +137,8 @@ class SocketManager {
             }
         });
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         // ---- 远程光标 ----
         this.socket.on('cursor_move', (data) => {
             if (data.user_id === this.mySid) return;
@@ -257,6 +260,7 @@ class SocketManager {
         }
     }
 
+<<<<<<< HEAD
     // 批量变换同步（旋转/翻转/边框）
     sendBatchTransform(opIds, transformType, params) {
         if (this.socket && this.connected) {
@@ -269,6 +273,8 @@ class SocketManager {
         }
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // 处理远程批量撤销
     handleRemoteBatchUndo(batchOp) {
         if (!window.wb) return;
@@ -300,6 +306,7 @@ class SocketManager {
                 }
                 window.wb.redrawAll();
             }
+<<<<<<< HEAD
         } else if (type === 'batch_rotate' || type === 'batch_flip') {
             // 远程用户撤销了旋转/翻转 = 恢复原数据（包括 rotation/flipH/flipV/transformOrigin）
             if (batchOp.old_ops) {
@@ -339,6 +346,8 @@ class SocketManager {
                 }
                 window.wb.redrawAll();
             }
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
     }
 

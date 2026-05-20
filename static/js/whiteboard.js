@@ -29,6 +29,7 @@ class Whiteboard {
         this.calliLastWidth = 2;
         this.calliSegments = [];   // [{x1,y1,x2,y2,w}]
 
+<<<<<<< HEAD
         // 形状工具状态
         this.currentShape = null;  // 当前选中的形状名称
 
@@ -46,6 +47,8 @@ class Whiteboard {
         this.zoomScale = 1;
         this.zoomOrigin = { x: 0, y: 0 };
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         // 选择工具状态
         this.selectedOps = [];      // 当前选中的操作 ID 列表
         this.selectionRect = null;  // 框选区域 {x, y, w, h}
@@ -55,6 +58,7 @@ class Whiteboard {
         this.dragStartY = 0;
         this.dragOffsets = [];      // 拖拽偏移记录
 
+<<<<<<< HEAD
         // 右键菜单 + 变换状态
         this.clipboard = [];        // 剪贴板（复制的操作）
         this.isRotating = false;    // 正在旋转自定义
@@ -71,6 +75,8 @@ class Whiteboard {
         this.resizeStartX = 0;      // 拖拽起始鼠标位置
         this.resizeStartY = 0;
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         // 工具管理
         this.toolManager = new ToolManager();
 
@@ -127,6 +133,7 @@ class Whiteboard {
         this.previewCanvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
         this.previewCanvas.addEventListener('mouseleave', (e) => this.onMouseUp(e));
 
+<<<<<<< HEAD
         // 缩放工具右键缩小 / 选择工具右键菜单
         this.previewCanvas.addEventListener('contextmenu', (e) => {
             e.preventDefault();
@@ -168,6 +175,8 @@ class Whiteboard {
             }
         }, { passive: false });
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         // 触摸支持
         this.previewCanvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -205,6 +214,7 @@ class Whiteboard {
             // Escape 取消选择
             if (e.key === 'Escape') {
                 this.clearSelection();
+<<<<<<< HEAD
                 this.clearShapeSelection();
                 this._hideContextMenu();
             }
@@ -217,6 +227,8 @@ class Whiteboard {
             if (e.ctrlKey && e.key === 'v' && this.clipboard.length > 0) {
                 e.preventDefault();
                 this.pasteClipboard();
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             }
         });
     }
@@ -224,14 +236,18 @@ class Whiteboard {
     touchToMouse(touch) {
         const rect = this.previewCanvas.getBoundingClientRect();
         return {
+<<<<<<< HEAD
             clientX: touch.clientX,
             clientY: touch.clientY,
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             offsetX: touch.clientX - rect.left,
             offsetY: touch.clientY - rect.top
         };
     }
 
     getMousePos(e) {
+<<<<<<< HEAD
         // 使用 clientX/clientY + getBoundingClientRect 计算坐标
         // 这样不受 CSS transform 对 offsetX/offsetY 的影响
         let clientX, clientY;
@@ -448,10 +464,14 @@ class Whiteboard {
             cx, bottomY
         );
         ctx.closePath();
+=======
+        return { x: e.offsetX, y: e.offsetY };
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     }
 
     // ========== 获取操作的包围盒 ==========
     getOpBounds(op) {
+<<<<<<< HEAD
         // 获取原始包围盒
         const raw = this._getRawBounds(op);
         if (!raw) return null;
@@ -502,14 +522,23 @@ class Whiteboard {
 
     // 获取操作的原始包围盒（不考虑 rotation/flip 变换）
     _getRawBounds(op) {
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         switch (op.type) {
             case 'pen':
             case 'eraser': {
                 if (!op.points || op.points.length === 0) return null;
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
                 for (const p of op.points) {
+<<<<<<< HEAD
                     minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
                     maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
+=======
+                    minX = Math.min(minX, p.x);
+                    minY = Math.min(minY, p.y);
+                    maxX = Math.max(maxX, p.x);
+                    maxY = Math.max(maxY, p.y);
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
                 }
                 const pad = (op.width || 2) / 2;
                 return { x: minX - pad, y: minY - pad, w: maxX - minX + op.width, h: maxY - minY + op.width };
@@ -538,6 +567,10 @@ class Whiteboard {
             case 'text': {
                 if (!op.position || !op.content) return null;
                 const fs = op.fontSize || 16;
+<<<<<<< HEAD
+=======
+                // 粗略估算文本宽度
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
                 const tw = op.content.length * fs * 0.6;
                 return { x: op.position[0], y: op.position[1], w: tw, h: fs * 1.4 };
             }
@@ -576,6 +609,7 @@ class Whiteboard {
                 }
                 return { x: minX-10, y: minY-10, w: maxX-minX+20, h: maxY-minY+20 };
             }
+<<<<<<< HEAD
             case 'shape': {
                 if (!op.start || !op.end) return null;
                 const pad = (op.width || 2) / 2;
@@ -618,6 +652,8 @@ class Whiteboard {
                 }
                 return null;
             }
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
         return null;
     }
@@ -642,6 +678,7 @@ class Whiteboard {
                py >= bounds.y - pad && py <= bounds.y + bounds.h + pad;
     }
 
+<<<<<<< HEAD
     // 判断点是否点击在旋转手柄上
     _hitRotateHandle(px, py) {
         if (this.selectedOps.length === 0) return null;
@@ -667,15 +704,20 @@ class Whiteboard {
         return null;
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // ========== 选择逻辑 ==========
     clearSelection() {
         this.selectedOps = [];
         this.selectionRect = null;
+<<<<<<< HEAD
         this.isResizing = false;
         this.resizeHandle = null;
         this.resizeStartBounds = null;
         this.resizeOrigOps = [];
         this.container.style.cursor = '';
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         this.drawSelectionOverlay();
         this.updateBatchBar();
     }
@@ -730,7 +772,11 @@ class Whiteboard {
             this.previewCtx.restore();
         }
 
+<<<<<<< HEAD
         // 绘制选中区域总包围盒 + 控制点 + 旋转手柄
+=======
+        // 绘制选中区域总包围盒
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         if (this.selectedOps.length > 0) {
             let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
             for (const op of this.operations) {
@@ -743,14 +789,18 @@ class Whiteboard {
                 maxY = Math.max(maxY, b.y + b.h);
             }
             if (minX !== Infinity) {
+<<<<<<< HEAD
                 const pad = 6;
                 const bx = minX - pad, by = minY - pad;
                 const bw = maxX - minX + pad * 2, bh = maxY - minY + pad * 2;
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
                 this.previewCtx.save();
                 this.previewCtx.strokeStyle = '#4361ee';
                 this.previewCtx.lineWidth = 2;
                 this.previewCtx.setLineDash([8, 4]);
+<<<<<<< HEAD
                 this.previewCtx.strokeRect(bx, by, bw, bh);
 
                 // 8个控制点: 四角 + 四边中点
@@ -794,6 +844,21 @@ class Whiteboard {
                 this.previewCtx.lineWidth = 1.5;
                 this.previewCtx.stroke();
 
+=======
+                this.previewCtx.strokeRect(minX - 6, minY - 6, maxX - minX + 12, maxY - minY + 12);
+
+                // 四角控制点
+                const corners = [
+                    [minX - 6, minY - 6],
+                    [maxX + 6, minY - 6],
+                    [minX - 6, maxY + 6],
+                    [maxX + 6, maxY + 6]
+                ];
+                this.previewCtx.fillStyle = '#4361ee';
+                for (const [cx, cy] of corners) {
+                    this.previewCtx.fillRect(cx - 4, cy - 4, 8, 8);
+                }
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
                 this.previewCtx.restore();
             }
         }
@@ -812,6 +877,7 @@ class Whiteboard {
         }
     }
 
+<<<<<<< HEAD
     // 获取8个控制点的坐标
     _getResizeHandles(bx, by, bw, bh) {
         return {
@@ -1146,6 +1212,8 @@ class Whiteboard {
         showToast('图形尺寸已调整');
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // ========== 批量操作 UI ==========
     updateBatchBar() {
         let bar = document.getElementById('batch-bar');
@@ -1185,6 +1253,7 @@ class Whiteboard {
 
         // 选择工具
         if (tool === 'select') {
+<<<<<<< HEAD
             // 检查是否点击旋转手柄
             if (this.selectedOps.length > 0 && !this.isRotating && !this.isResizing) {
                 const handleInfo = this._hitRotateHandle(pos.x, pos.y);
@@ -1229,6 +1298,8 @@ class Whiteboard {
                 }
             }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             // 检查是否点击在已选中项上（开始拖拽）
             if (this.selectedOps.length > 0) {
                 const hitOp = this.operations.find(op => this.selectedOps.includes(op.id) && this.isOpAtPoint(op, pos.x, pos.y));
@@ -1262,6 +1333,7 @@ class Whiteboard {
             return;
         }
 
+<<<<<<< HEAD
         // 填充工具：点击即填充
         if (tool === 'fill') {
             this._floodFill(pos.x, pos.y);
@@ -1284,6 +1356,8 @@ class Whiteboard {
             return;
         }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         if (tool === 'pen' || tool === 'eraser') {
             this.currentPath = [{ x: pos.x, y: pos.y }];
             this.mainCtx.beginPath();
@@ -1301,6 +1375,7 @@ class Whiteboard {
             this.mainCtx.lineJoin = 'round';
         }
 
+<<<<<<< HEAD
         if (tool === 'brush') {
             this._initBrushStroke(pos);
         }
@@ -1326,6 +1401,18 @@ class Whiteboard {
             }
             // 没有点击到已有形状 → 清除之前的选中，正常绘制新形状
             this.clearShapeSelection();
+=======
+        if (tool === 'spray') {
+            this.sprayDots = [];
+            this.sprayCurrentPos = { x: pos.x, y: pos.y };
+            this._startSpray();
+        }
+
+        if (tool === 'calligraphy') {
+            this.calliLastPos = { x: pos.x, y: pos.y };
+            this.calliLastWidth = this.toolManager.getWidth() * 2;
+            this.calliSegments = [];
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
     }
 
@@ -1341,6 +1428,7 @@ class Whiteboard {
 
         // 选择工具 - 框选
         if (tool === 'select') {
+<<<<<<< HEAD
             // 旋转中
             if (this.isRotating) {
                 const currentAngle = Math.atan2(pos.y - this.rotateCenterY, pos.x - this.rotateCenterX);
@@ -1373,6 +1461,8 @@ class Whiteboard {
                 return;
             }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             if (this.isDragging) {
                 // 拖拽预览
                 const dx = pos.x - this.dragStartX;
@@ -1401,6 +1491,7 @@ class Whiteboard {
                 return;
             }
             
+<<<<<<< HEAD
             // 旋转手柄悬浮检测 + 控制点光标检测 + 图形移动光标
             if (this.selectedOps.length > 0 && !this.isDragging && !this.isSelecting) {
                 const handleInfo = this._hitRotateHandle(pos.x, pos.y);
@@ -1425,6 +1516,8 @@ class Whiteboard {
                 }
             }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
             if (this.isSelecting) {
                 const x = Math.min(this.startX, pos.x);
                 const y = Math.min(this.startY, pos.y);
@@ -1437,6 +1530,7 @@ class Whiteboard {
             return;
         }
 
+<<<<<<< HEAD
         if (!this.isDrawing) {
             // 形状工具拖拽选中形状
             if (tool === 'shape' && this.isShapeDragging && this.selectedShapeId) {
@@ -1475,11 +1569,15 @@ class Whiteboard {
             }
             return;
         }
+=======
+        if (!this.isDrawing) return;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
 
         if (tool === 'pen' || tool === 'eraser') {
             this.mainCtx.lineTo(pos.x, pos.y);
             this.mainCtx.stroke();
             this.currentPath.push({ x: pos.x, y: pos.y });
+<<<<<<< HEAD
         } else if (tool === 'brush') {
             this._drawBrushMove(pos);
         } else if (tool === 'shape' && this.currentShape) {
@@ -1491,6 +1589,53 @@ class Whiteboard {
             this.previewCtx.lineJoin = 'round';
             this.drawShapePath(this.previewCtx, this.currentShape, this.startX, this.startY, pos.x, pos.y);
             this.previewCtx.stroke();
+=======
+        } else if (['line', 'rect', 'circle', 'filled_rect', 'filled_circle', 'filled_triangle'].includes(tool)) {
+            // 预览层绘制
+            this.previewCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
+            const color = this.toolManager.getColor();
+            const width = this.toolManager.getWidth();
+            this.previewCtx.strokeStyle = color;
+            this.previewCtx.fillStyle = color;
+            this.previewCtx.lineWidth = width;
+            this.previewCtx.lineCap = 'round';
+            this.previewCtx.lineJoin = 'round';
+            this.previewCtx.beginPath();
+
+            if (tool === 'line') {
+                this.previewCtx.moveTo(this.startX, this.startY);
+                this.previewCtx.lineTo(pos.x, pos.y);
+                this.previewCtx.stroke();
+            } else if (tool === 'rect') {
+                this.previewCtx.rect(this.startX, this.startY, pos.x - this.startX, pos.y - this.startY);
+                this.previewCtx.stroke();
+            } else if (tool === 'circle') {
+                const radius = Math.sqrt(Math.pow(pos.x-this.startX,2)+Math.pow(pos.y-this.startY,2));
+                this.previewCtx.arc(this.startX, this.startY, radius, 0, Math.PI*2);
+                this.previewCtx.stroke();
+            } else if (tool === 'filled_rect') {
+                this.previewCtx.fillRect(this.startX, this.startY, pos.x-this.startX, pos.y-this.startY);
+            } else if (tool === 'filled_circle') {
+                const radius = Math.sqrt(Math.pow(pos.x-this.startX,2)+Math.pow(pos.y-this.startY,2));
+                this.previewCtx.arc(this.startX, this.startY, radius, 0, Math.PI*2);
+                this.previewCtx.fill();
+            } else if (tool === 'filled_triangle') {
+                // 以起点为顶点，当前点确定底边
+                const [ax, ay] = [this.startX, this.startY];
+                const [bx, by] = [pos.x, pos.y];
+                const mx = (ax + bx) / 2;
+                const half = Math.abs(bx - ax) / 2;
+                this.previewCtx.moveTo(ax, ay);
+                this.previewCtx.lineTo(bx, by);
+                this.previewCtx.lineTo(mx * 2 - bx, by);
+                this.previewCtx.closePath();
+                this.previewCtx.fill();
+            }
+        } else if (tool === 'spray') {
+            this.sprayCurrentPos = { x: pos.x, y: pos.y };
+        } else if (tool === 'calligraphy') {
+            this._drawCalliSegment(pos);
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
     }
 
@@ -1499,6 +1644,7 @@ class Whiteboard {
 
         // 选择工具
         if (tool === 'select') {
+<<<<<<< HEAD
             // 控制点拖拽缩放/拉伸完成
             if (this.isResizing) {
                 this._finishResize(e);
@@ -1557,6 +1703,13 @@ class Whiteboard {
                 const pos = this.getMousePos(e);
                 const dx = pos.x - this.dragStartX;
                 const dy = pos.y - this.dragStartY;
+=======
+            if (this.isDragging) {
+                // 完成拖拽移动
+                const pos = this.getMousePos(e);
+                const dx = (e.offsetX !== undefined ? e.offsetX : this.dragStartX) - this.dragStartX;
+                const dy = (e.offsetY !== undefined ? e.offsetY : this.dragStartY) - this.dragStartY;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
                 if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
                     this.batchMove(dx, dy);
                 } else {
@@ -1586,6 +1739,7 @@ class Whiteboard {
             return;
         }
 
+<<<<<<< HEAD
         if (!this.isDrawing) {
             // 形状工具拖拽完成
             if (tool === 'shape' && this.isShapeDragging) {
@@ -1626,6 +1780,9 @@ class Whiteboard {
             }
             return;
         }
+=======
+        if (!this.isDrawing) return;
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         this.isDrawing = false;
 
         const color = this.toolManager.getColor();
@@ -1647,6 +1804,7 @@ class Whiteboard {
                 points: [...this.currentPath],
                 width: width * 3
             };
+<<<<<<< HEAD
         } else if (tool === 'brush') {
             operation = this._finishBrushStroke(color, width);
         } else if (tool === 'shape' && this.currentShape) {
@@ -1672,6 +1830,76 @@ class Whiteboard {
                 color: color,
                 width: width
             };
+=======
+        } else if (tool === 'spray') {
+            this._stopSpray();
+            if (this.sprayDots.length > 0) {
+                operation = {
+                    type: 'spray',
+                    dots: [...this.sprayDots],
+                    color: color,
+                    radius: this.toolManager.getWidth() * 3 + 10,
+                    dotSize: Math.max(1, this.toolManager.getWidth() * 0.5)
+                };
+            }
+            this.sprayDots = [];
+        } else if (tool === 'calligraphy') {
+            if (this.calliSegments.length > 0) {
+                operation = {
+                    type: 'calligraphy',
+                    segments: [...this.calliSegments],
+                    color: color
+                };
+            }
+            this.calliLastPos = null;
+            this.calliSegments = [];
+        } else if (['line', 'rect', 'circle', 'filled_rect', 'filled_circle', 'filled_triangle'].includes(tool)) {
+            const pos = e.offsetX !== undefined ? this.getMousePos(e) : { x: this.startX, y: this.startY };
+            this.previewCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
+
+            // 在主 canvas 上绘制
+            this.mainCtx.globalCompositeOperation = 'source-over';
+            this.mainCtx.strokeStyle = color;
+            this.mainCtx.fillStyle = color;
+            this.mainCtx.lineWidth = width;
+            this.mainCtx.lineCap = 'round';
+            this.mainCtx.lineJoin = 'round';
+            this.mainCtx.beginPath();
+
+            if (tool === 'line') {
+                this.mainCtx.moveTo(this.startX, this.startY);
+                this.mainCtx.lineTo(pos.x, pos.y);
+                this.mainCtx.stroke();
+                operation = { type: 'line', start: [this.startX, this.startY], end: [pos.x, pos.y], color, width };
+            } else if (tool === 'rect') {
+                this.mainCtx.rect(this.startX, this.startY, pos.x-this.startX, pos.y-this.startY);
+                this.mainCtx.stroke();
+                operation = { type: 'rect', start: [this.startX, this.startY], end: [pos.x, pos.y], color, width };
+            } else if (tool === 'circle') {
+                const radius = Math.sqrt(Math.pow(pos.x-this.startX,2)+Math.pow(pos.y-this.startY,2));
+                this.mainCtx.arc(this.startX, this.startY, radius, 0, Math.PI*2);
+                this.mainCtx.stroke();
+                operation = { type: 'circle', center: [this.startX, this.startY], radius, color, width };
+            } else if (tool === 'filled_rect') {
+                this.mainCtx.fillRect(this.startX, this.startY, pos.x-this.startX, pos.y-this.startY);
+                operation = { type: 'filled_rect', start: [this.startX, this.startY], end: [pos.x, pos.y], color };
+            } else if (tool === 'filled_circle') {
+                const radius = Math.sqrt(Math.pow(pos.x-this.startX,2)+Math.pow(pos.y-this.startY,2));
+                this.mainCtx.arc(this.startX, this.startY, radius, 0, Math.PI*2);
+                this.mainCtx.fill();
+                operation = { type: 'filled_circle', center: [this.startX, this.startY], radius, color };
+            } else if (tool === 'filled_triangle') {
+                const [ax, ay] = [this.startX, this.startY];
+                const [bx, by] = [pos.x, pos.y];
+                const [cx, cy] = [ax*2-bx, by];
+                this.mainCtx.moveTo(ax, ay);
+                this.mainCtx.lineTo(bx, by);
+                this.mainCtx.lineTo(cx, cy);
+                this.mainCtx.closePath();
+                this.mainCtx.fill();
+                operation = { type: 'filled_triangle', points: [[ax,ay],[bx,by],[cx,cy]], color };
+            }
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
 
         if (operation) {
@@ -1754,6 +1982,7 @@ class Whiteboard {
         input.focus();
     }
 
+<<<<<<< HEAD
     // ========== 形状工具选中高亮 ==========
     _drawShapeSelectionOverlay(op) {
         this.previewCtx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
@@ -2206,6 +2435,8 @@ class Whiteboard {
         console.log('[WB] 边框:', style);
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // ========== 获取操作锚点（用于移动计算） ==========
     getOpAnchor(op) {
         switch (op.type) {
@@ -2228,8 +2459,11 @@ class Whiteboard {
                 return op.dots.length > 0 ? { x: op.dots[0].x, y: op.dots[0].y } : { x: 0, y: 0 };
             case 'calligraphy':
                 return op.segments.length > 0 ? { x: op.segments[0].x1, y: op.segments[0].y1 } : { x: 0, y: 0 };
+<<<<<<< HEAD
             case 'shape':
                 return { x: op.start[0], y: op.start[1] };
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
         return { x: 0, y: 0 };
     }
@@ -2267,6 +2501,7 @@ class Whiteboard {
             case 'calligraphy':
                 moved.segments = moved.segments.map(s => ({ x1:s.x1+dx, y1:s.y1+dy, x2:s.x2+dx, y2:s.y2+dy, w:s.w }));
                 break;
+<<<<<<< HEAD
             case 'shape':
                 moved.start = [moved.start[0] + dx, moved.start[1] + dy];
                 moved.end = [moved.end[0] + dx, moved.end[1] + dy];
@@ -2280,6 +2515,8 @@ class Whiteboard {
         // 偏移 transformOrigin
         if (moved.transformOrigin) {
             moved.transformOrigin = [moved.transformOrigin[0] + dx, moved.transformOrigin[1] + dy];
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
         return moved;
     }
@@ -2514,6 +2751,7 @@ class Whiteboard {
         this.calliLastPos = { x: pos.x, y: pos.y };
     }
 
+<<<<<<< HEAD
     // ========== 画笔工具统一引擎 ==========
     _initBrushStroke(pos) {
         const brush = this.currentBrush || 'inkbrush';
@@ -2906,10 +3144,13 @@ class Whiteboard {
         }
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // ========== 重放远程操作 ==========
     replayDraw(operation) {
         const ctx = this.mainCtx;
 
+<<<<<<< HEAD
         // 检查是否有变换属性（rotation/flipH/flipV）
         const hasRotation = operation.rotation != null && operation.rotation !== 0;
         const hasFlip = operation.flipH || operation.flipV;
@@ -2925,6 +3166,8 @@ class Whiteboard {
             ctx.translate(-ox, -oy);
         }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         if (operation.type === 'pen') {
             ctx.globalCompositeOperation = 'source-over';
             ctx.strokeStyle = operation.color;
@@ -2955,6 +3198,7 @@ class Whiteboard {
             ctx.globalCompositeOperation = 'source-over';
         } else if (operation.type === 'line') {
             ctx.globalCompositeOperation = 'source-over';
+<<<<<<< HEAD
             if (operation.borderStyle === 'none') {
                 // 无边框，跳过绘制
             } else {
@@ -3010,6 +3254,33 @@ class Whiteboard {
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
+=======
+            ctx.strokeStyle = operation.color;
+            ctx.lineWidth = operation.width;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(operation.start[0], operation.start[1]);
+            ctx.lineTo(operation.end[0], operation.end[1]);
+            ctx.stroke();
+        } else if (operation.type === 'rect') {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = operation.color;
+            ctx.lineWidth = operation.width;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.rect(operation.start[0], operation.start[1],
+                     operation.end[0] - operation.start[0],
+                     operation.end[1] - operation.start[1]);
+            ctx.stroke();
+        } else if (operation.type === 'circle') {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = operation.color;
+            ctx.lineWidth = operation.width;
+            ctx.beginPath();
+            ctx.arc(operation.center[0], operation.center[1], operation.radius, 0, Math.PI * 2);
+            ctx.stroke();
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         } else if (operation.type === 'text') {
             ctx.globalCompositeOperation = 'source-over';
             ctx.font = `${operation.fontSize}px sans-serif`;
@@ -3064,6 +3335,7 @@ class Whiteboard {
                 ctx.closePath();
                 ctx.fill();
             }
+<<<<<<< HEAD
         } else if (operation.type === 'fill') {
             ctx.globalCompositeOperation = 'source-over';
             // 重放填充操作
@@ -3214,6 +3486,8 @@ class Whiteboard {
         // 恢复 Canvas Transform
         if (hasTransform) {
             ctx.restore();
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         }
 
         console.log('[WB] 重放远程操作:', operation.type, 'id:', operation.id);
@@ -3277,6 +3551,7 @@ class Whiteboard {
             console.log('[WB] 撤销批量换色');
             return;
         }
+<<<<<<< HEAD
 
         if (op.type === 'batch_rotate') {
             // 撤销旋转 = 恢复旋转前的操作数据（包括 rotation/transformOrigin 等属性）
@@ -3352,6 +3627,8 @@ class Whiteboard {
             console.log('[WB] 撤销缩放/拉伸');
             return;
         }
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
         
         if (op.type === 'batch_undo') {
             // 撤销"批量撤销" = 重做那些操作
@@ -3445,6 +3722,7 @@ class Whiteboard {
         console.log('[WB] 远程批量换色:', opIds.length, '个操作');
     }
 
+<<<<<<< HEAD
     // 远程批量变换（旋转/翻转/边框）
     remoteBatchTransform(opIds, transformType, params) {
         if (transformType === 'rotate') {
@@ -3497,6 +3775,8 @@ class Whiteboard {
         console.log('[WB] 远程批量变换:', transformType, opIds.length, '个操作');
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // 加载快照
     loadSnapshot(snapshot) {
         if (snapshot && snapshot.objects) {
@@ -3506,6 +3786,7 @@ class Whiteboard {
         }
     }
 
+<<<<<<< HEAD
     // ========== 导出图片 ==========
     async exportImage(format = 'png') {
         // 创建临时画布，确保白底
@@ -3598,6 +3879,8 @@ class Whiteboard {
         console.log('[WB] 导出图片:', ext, tempCanvas.width, 'x', tempCanvas.height);
     }
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     // 获取快照数据
     getSnapshot() {
         return {

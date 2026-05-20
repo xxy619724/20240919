@@ -16,6 +16,7 @@ class ToolManager {
                 btn.classList.add('active');
                 this.currentTool = btn.dataset.tool;
 
+<<<<<<< HEAD
                 // 切换工具光标：先清除所有特殊模式，再添加当前模式
                 const container = document.getElementById('canvas-container');
                 if (container) {
@@ -60,6 +61,22 @@ class ToolManager {
                 const zoomCtrl = document.getElementById('zoom-control');
                 if (zoomCtrl) {
                     zoomCtrl.style.display = (this.currentTool === 'zoom') ? 'flex' : 'none';
+=======
+                // 切换选择工具光标
+                const container = document.getElementById('canvas-container');
+                if (container) {
+                    if (this.currentTool === 'select') {
+                        container.classList.add('select-mode');
+                    } else {
+                        container.classList.remove('select-mode');
+                        container.classList.remove('dragging');
+                    }
+                }
+
+                // 非选择工具时清除选中
+                if (this.currentTool !== 'select' && window.wb) {
+                    window.wb.clearSelection();
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
                 }
             });
         });

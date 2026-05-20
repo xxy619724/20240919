@@ -259,6 +259,7 @@ def register_socket_handlers(sio):
             'batch_op': batch_op
         }, room=room_id, skip_sid=request.sid)
 
+<<<<<<< HEAD
     @sio.on('batch_transform')
     def handle_batch_transform(data):
         room_id = data.get('room_id')
@@ -277,4 +278,6 @@ def register_socket_handlers(sio):
             'params': params
         }, room=room_id, skip_sid=request.sid)
 
+=======
+>>>>>>> 186a6d53c0e9a89b7da898444053cd03e22b8a70
     print('[Socket] WebSocket 事件处理器已注册')
