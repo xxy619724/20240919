@@ -1,0 +1,557 @@
+{% extends "base.html" %}
+
+{% block title %}在线白板 - {{ room.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/whiteboard.css', v=21) }}">
+{% endblock %}
+
+{% block content %}
+<div class="whiteboard-page">
+    <!-- 顶部栏 -->
+    <div class="wb-header">
+        <div class="wb-header-left">
+            <a href="/" class="back-btn">← 返回</a>
+            <span class="room-name">{{ room.name }}</span>
+            <span class="room-id">ID: {{ room.id }}</span>
+        </div>
+        <div class="wb-header-center">
+            <span class="online-count" id="online-count">🟢 1人在线</span>
+        </div>
+        <div class="wb-header-right">
+            <div class="export-dropdown">
+                <button class="btn btn-outline btn-sm export-btn" onclick="toggleExportMenu()">
+                    📥 导出
+                </button>
+                <div class="export-menu" id="export-menu">
+                    <button onclick="exportAs('png')">导出为 PNG</button>
+                    <button onclick="exportAs('jpg')">导出为 JPG</button>
+                </div>
+            </div>
+            <button onclick="copyLink()" class="btn btn-outline btn-sm">🔗 复制链接</button>
+            {% if user %}
+            <button onclick="saveSnapshot()" class="btn btn-primary btn-sm">💾 保存</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="wb-body">
+        <!-- 左侧工具栏 -->
+        <div class="toolbar" id="toolbar">
+            <button class="tool-btn active" data-tool="pen" title="画笔">✏️</button>
+            <button class="tool-btn" data-tool="eraser" title="橡皮擦">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+                    <path d="M4 20h16"/>
+                    <path d="M5 20l6-14 10 10-6 6H5z"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="brush-tool-btn" data-tool="brush" title="画笔">
+                🖌️
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="text" title="文本">📝</button>
+            <button class="tool-btn" id="shape-tool-btn" data-tool="shape" title="形状">
+                📐
+            </button>
+            <button class="tool-btn" data-tool="fill" title="填充">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+                    <path d="M2 22l1-1h4l9-9"/>
+                    <path d="M3 21l7-7 4 4-7 7"/>
+                    <path d="M14 14l3-3 4 4-3 3z"/>
+                    <path d="M20 16c1 1.5 2 3 2 4s-1 2-2 2-2-1-2-2 1-2.5 2-4z" fill="#555" stroke="none"/>
+                </svg>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="eyedropper" title="取色器">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+                    <path d="M2 22l1-1 4-4"/>
+                    <path d="M7 17l10-10"/>
+                    <path d="M14 3l4 4 2-2a1.4 1.4 0 00-2-2l-2 2-4-4-2 2 4 4z"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="zoom-tool-btn" data-tool="zoom" title="缩放">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+                    <circle cx="10" cy="10" r="7"/>
+                    <path d="M15 15l5 5"/>
+                    <path d="M10 7v6M7 10h6"/>
+                </svg>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button class="tool-btn" data-tool="select" title="选择">👆</button>
+            <!-- 缩放控制条 -->
+            <div class="zoom-control" id="zoom-control" style="display:none;">
+                <div class="zoom-control-row">
+                    <button class="zoom-btn" id="zoom-out-btn" title="缩小">−</button>
+                    <span class="zoom-level" id="zoom-level">100%</span>
+                    <button class="zoom-btn" id="zoom-in-btn" title="放大">+</button>
+                </div>
+                <button class="zoom-btn" id="zoom-reset-btn" title="重置" style="width:62px;">↺</button>
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="color-picker">
+                <div class="color-presets">
+                    <button class="color-btn active" data-color="#000000" style="background:#000000"></button>
+                    <button class="color-btn" data-color="#FF0000" style="background:#FF0000"></button>
+                    <button class="color-btn" data-color="#0000FF" style="background:#0000FF"></button>
+                    <button class="color-btn" data-color="#00AA00" style="background:#00AA00"></button>
+                    <button class="color-btn" data-color="#FF6600" style="background:#FF6600"></button>
+                    <button class="color-btn" data-color="#9900CC" style="background:#9900CC"></button>
+                    <button class="color-btn" data-color="#FFCC00" style="background:#FFCC00"></button>
+                    <button class="color-btn" data-color="#FFFFFF" style="background:#FFFFFF;border:1px solid #ccc"></button>
+                </div>
+                <input type="color" id="custom-color" value="#000000" title="自定义颜色">
+            </div>
+            <div class="toolbar-divider"></div>
+            <div class="width-control">
+                <label>粗细</label>
+                <input type="range" id="line-width" min="1" max="20" value="2">
+                <span id="width-value">2</span>
+            </div>
+        </div>
+
+        <!-- 形状选择弹出框 -->
+        <div class="shape-dialog" id="shape-panel">
+            <div class="shape-dialog-header" id="shape-dialog-header">
+                <span class="shape-dialog-title">形状</span>
+                <button class="shape-dialog-close" id="shape-dialog-close" title="关闭">&times;</button>
+            </div>
+            <div class="shape-grid">
+                <button class="shape-item" data-shape="line" title="直线">
+                    <svg viewBox="0 0 40 40"><line x1="4" y1="36" x2="36" y2="4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="curve" title="曲线">
+                    <svg viewBox="0 0 40 40"><path d="M5 35 Q5 5 35 5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="ellipse" title="椭圆">
+                    <svg viewBox="0 0 40 40"><ellipse cx="20" cy="20" rx="16" ry="10" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>
+                </button>
+                <button class="shape-item" data-shape="rect" title="矩形">
+                    <svg viewBox="0 0 40 40"><rect x="6" y="10" width="28" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="triangle" title="三角形">
+                    <svg viewBox="0 0 40 40"><polygon points="20,4 38,36 2,36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="trapezoid" title="梯形">
+                    <svg viewBox="0 0 40 40"><polygon points="10,6 30,6 38,34 2,34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="diamond" title="菱形">
+                    <svg viewBox="0 0 40 40"><polygon points="20,2 38,20 20,38 2,20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="pentagon" title="正五边形">
+                    <svg viewBox="0 0 40 40"><polygon points="20,3 37,15 31,35 9,35 3,15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="hexagon" title="正六边形">
+                    <svg viewBox="0 0 40 40"><polygon points="20,3 36,11 36,28 20,37 4,28 4,11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="arrow_right" title="右箭头">
+                    <svg viewBox="0 0 40 40"><polygon points="4,14 26,14 26,4 38,20 26,36 26,26 4,26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="arrow_left" title="左箭头">
+                    <svg viewBox="0 0 40 40"><polygon points="36,14 14,14 14,4 2,20 14,36 14,26 36,26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="arrow_up" title="上箭头">
+                    <svg viewBox="0 0 40 40"><polygon points="14,36 14,14 4,14 20,2 36,14 26,14 26,36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="arrow_down" title="下箭头">
+                    <svg viewBox="0 0 40 40"><polygon points="14,4 14,26 4,26 20,38 36,26 26,26 26,4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="star_5" title="五角星">
+                    <svg viewBox="0 0 40 40"><polygon points="20,2 24.5,15 38,15 27,23.5 31,37 20,28.5 9,37 13,23.5 2,15 15.5,15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="star_5_slim" title="尖五角星">
+                    <svg viewBox="0 0 40 40"><polygon points="20,2 22.5,14 38,14 26,23 30,38 20,28 10,38 14,23 2,14 17.5,14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="star_5_bold" title="胖五角星">
+                    <svg viewBox="0 0 40 40"><polygon points="20,5 25,16 36,16 27,24 30,36 20,29 10,36 13,24 4,16 15,16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="shape-item" data-shape="heart" title="心形">
+                    <svg viewBox="0 0 40 40"><path d="M20,36 C18,32 4,24 4,14 C4,6 10,2 16,6 C18,7.5 19.5,10 20,12 C20.5,10 22,7.5 24,6 C30,2 36,6 36,14 C36,24 22,32 20,36Z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 画笔选择右拉弹出框 -->
+        <div class="brush-dialog" id="brush-panel">
+            <div class="brush-dialog-header" id="brush-dialog-header">
+                <span class="brush-dialog-title">画笔</span>
+                <button class="brush-dialog-close" id="brush-dialog-close" title="关闭">&times;</button>
+            </div>
+            <div class="brush-list">
+                <button class="brush-item active" data-brush="inkbrush" title="毛笔">
+                    <span class="brush-name">毛笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 20 Q10 4 16 18 Q20 8 26 16 Q32 2 40 14 Q46 6 52 18 Q58 4 64 16 Q70 8 76 20" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" opacity="0.8"/></svg>
+                </button>
+                <button class="brush-item" data-brush="pen" title="书写笔">
+                    <span class="brush-name">书写笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 12 Q16 8 28 14 Q40 10 52 12 Q64 8 76 12" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+                <button class="brush-item" data-brush="spray" title="喷枪">
+                    <span class="brush-name">喷枪</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><circle cx="12" cy="12" r="1" fill="#333" opacity="0.6"/><circle cx="18" cy="8" r="0.8" fill="#333" opacity="0.5"/><circle cx="24" cy="14" r="1.2" fill="#333" opacity="0.7"/><circle cx="30" cy="10" r="0.7" fill="#333" opacity="0.4"/><circle cx="36" cy="16" r="1" fill="#333" opacity="0.6"/><circle cx="42" cy="9" r="0.9" fill="#333" opacity="0.5"/><circle cx="48" cy="13" r="1.1" fill="#333" opacity="0.6"/><circle cx="54" cy="7" r="0.8" fill="#333" opacity="0.4"/><circle cx="60" cy="15" r="0.9" fill="#333" opacity="0.5"/><circle cx="66" cy="11" r="1" fill="#333" opacity="0.6"/><circle cx="15" cy="16" r="0.6" fill="#333" opacity="0.3"/><circle cx="33" cy="6" r="0.7" fill="#333" opacity="0.3"/><circle cx="45" cy="17" r="0.8" fill="#333" opacity="0.3"/><circle cx="57" cy="8" r="0.5" fill="#333" opacity="0.3"/></svg>
+                </button>
+                <button class="brush-item" data-brush="oil" title="油画笔">
+                    <span class="brush-name">油画笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 14 Q12 6 20 14 Q28 6 36 14 Q44 6 52 14 Q60 6 68 14 Q74 10 76 14" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round" opacity="0.7"/></svg>
+                </button>
+                <button class="brush-item" data-brush="crayon" title="蜡笔">
+                    <span class="brush-name">蜡笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 12 Q20 10 40 14 Q60 10 76 12" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" opacity="0.45"/></svg>
+                </button>
+                <button class="brush-item" data-brush="marker" title="记号笔">
+                    <span class="brush-name">记号笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 12 L76 12" stroke="#333" stroke-width="6" stroke-linecap="round" opacity="0.55"/></svg>
+                </button>
+                <button class="brush-item" data-brush="pencil" title="铅笔">
+                    <span class="brush-name">铅笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 12 Q12 11 20 12.5 Q28 11.5 36 12 Q44 11 52 12.5 Q60 11.5 68 12 Q72 11.5 76 12" fill="none" stroke="#333" stroke-width="1" stroke-linecap="round" opacity="0.6"/><path d="M4 12.5 Q12 12 20 13 Q28 12 36 12.5 Q44 12 52 13 Q60 12 68 12.5 Q72 12 76 12.5" fill="none" stroke="#333" stroke-width="0.6" stroke-linecap="round" opacity="0.35"/></svg>
+                </button>
+                <button class="brush-item" data-brush="watercolor" title="水彩笔">
+                    <span class="brush-name">水彩笔</span>
+                    <svg class="brush-preview" viewBox="0 0 80 24"><path d="M4 12 Q16 4 28 16 Q40 4 52 16 Q64 4 76 12" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round" opacity="0.35"/><path d="M4 14 Q16 8 28 18 Q40 8 52 18 Q64 8 76 14" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" opacity="0.25"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas 白板 -->
+        <div class="canvas-container" id="canvas-container">
+            <canvas id="main-canvas"></canvas>
+            <canvas id="preview-canvas"></canvas>
+        </div>
+
+        <!-- 右键上下文菜单 -->
+        <div class="context-menu" id="context-menu">
+            <div class="cm-item" data-action="copy">
+                <span class="cm-icon-svg"><svg viewBox="0 0 16 16" width="14" height="14"><rect x="5" y="5" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="3" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span>
+                <span class="cm-label">复制</span>
+                <span class="cm-shortcut">Ctrl+C</span>
+            </div>
+            <div class="cm-item" data-action="paste">
+                <span class="cm-icon-svg"><svg viewBox="0 0 16 16" width="14" height="14"><rect x="4" y="5" width="9" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="5.5" y="3" width="6" height="3" rx="0.8" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></span>
+                <span class="cm-label">粘贴</span>
+                <span class="cm-shortcut">Ctrl+V</span>
+            </div>
+            <div class="cm-divider"></div>
+            <div class="cm-item" data-action="delete">
+                <span class="cm-icon-svg"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 4h10M6 4V3h4v1M5 6l.5 7h5l.5-7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="cm-label">删除</span>
+                <span class="cm-shortcut">Del</span>
+            </div>
+            <div class="cm-divider"></div>
+            <div class="cm-item has-submenu">
+                <span class="cm-icon-svg"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 2v3M8 2l1.5 1.5M8 2L6.5 3.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.5 9A4.5 4.5 0 115 5.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+                <span class="cm-label">旋转</span>
+                <span class="cm-arrow">&#9656;</span>
+                <div class="cm-submenu">
+                    <div class="cm-item" data-action="rotate-right90">向右旋转 90&#176;</div>
+                    <div class="cm-item" data-action="rotate-left90">向左旋转 90&#176;</div>
+                    <div class="cm-item" data-action="rotate-180">旋转 180&#176;</div>
+                    <div class="cm-item" data-action="rotate-custom">自定义旋转</div>
+                </div>
+            </div>
+            <div class="cm-item has-submenu">
+                <span class="cm-icon-svg"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M2 8h12M8 2v12" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M12 6l2 2-2 2M4 6L2 8l2 2M6 4L8 2l2 2M6 12l2 2 2-2" fill="none" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="cm-label">翻转</span>
+                <span class="cm-arrow">&#9656;</span>
+                <div class="cm-submenu">
+                    <div class="cm-item" data-action="flip-h">水平翻转</div>
+                    <div class="cm-item" data-action="flip-v">垂直翻转</div>
+                </div>
+            </div>
+            <div class="cm-item has-submenu">
+                <span class="cm-icon-svg"><svg viewBox="0 0 16 16" width="14" height="14"><rect x="2" y="3" width="12" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.3"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1" stroke-dasharray="1.5 1"/></svg></span>
+                <span class="cm-label">边框</span>
+                <span class="cm-arrow">&#9656;</span>
+                <div class="cm-submenu">
+                    <div class="cm-item" data-action="border-solid">实线</div>
+                    <div class="cm-item" data-action="border-dashed">虚线</div>
+                    <div class="cm-item" data-action="border-none">无边框</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右下角撤销/重做 -->
+    <div class="undo-redo-bar">
+        <button class="btn btn-outline btn-sm" onclick="undo()" title="撤销 (Ctrl+Z)">↩️ 撤销</button>
+        <button class="btn btn-outline btn-sm" onclick="redo()" title="重做 (Ctrl+Y)">↪️ 重做</button>
+        <button class="btn btn-outline btn-sm" onclick="wb.batchUndo()" title="批量撤销5步 (Ctrl+Shift+Z)">⏪ 批量撤销</button>
+    </div>
+</div>
+
+<script>
+window.ROOM_ID = '{{ room.id }}';
+window.ROOM_NAME = '{{ room.name }}';
+window.IS_LOGGED_IN = {{ 'true' if user else 'false' }};
+window.NICKNAME = '{{ user.username if user else "访客" }}';
+window.SNAPSHOT = {{ room.snapshot|safe if room.snapshot else 'null' }};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/tools.js', v=12) }}"></script>
+<script src="{{ url_for('static', filename='js/whiteboard.js', v=20) }}"></script>
+<script src="{{ url_for('static', filename='js/socket.js', v=8) }}"></script>
+<script>
+// 形状弹出框
+let _shapePanelPos = null; // 记住拖拽后的位置
+function toggleShapePanel() {
+    const panel = document.getElementById('shape-panel');
+    if (panel.classList.contains('show')) {
+        panel.classList.remove('show');
+        return;
+    }
+    // 定位到📐按钮右侧
+    const btn = document.getElementById('shape-tool-btn');
+    const btnRect = btn.getBoundingClientRect();
+    if (!_shapePanelPos) {
+        panel.style.left = (btnRect.right + 6) + 'px';
+        panel.style.top = btnRect.top + 'px';
+    } else {
+        panel.style.left = _shapePanelPos.x + 'px';
+        panel.style.top = _shapePanelPos.y + 'px';
+    }
+    panel.classList.add('show');
+}
+
+function closeShapePanel() {
+    const panel = document.getElementById('shape-panel');
+    if (panel) panel.classList.remove('show');
+}
+
+// X 关闭按钮
+document.getElementById('shape-dialog-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeShapePanel();
+});
+
+// 拖拽弹出框（fixed 定位，直接用 clientX/Y）
+(function() {
+    const header = document.getElementById('shape-dialog-header');
+    const panel = document.getElementById('shape-panel');
+    let dragging = false, startX, startY, origLeft, origTop;
+
+    header.addEventListener('mousedown', function(e) {
+        if (e.target.closest('.shape-dialog-close')) return;
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = parseInt(panel.style.left) || 80;
+        origTop = parseInt(panel.style.top) || 50;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!dragging) return;
+        const x = origLeft + (e.clientX - startX);
+        const y = origTop + (e.clientY - startY);
+        panel.style.left = x + 'px';
+        panel.style.top = y + 'px';
+        _shapePanelPos = { x, y };
+    });
+
+    document.addEventListener('mouseup', function() {
+        dragging = false;
+    });
+})();
+
+// 选择形状 — 不关闭弹出框
+document.addEventListener('click', function(e) {
+    const shapeItem = e.target.closest('.shape-item');
+    if (shapeItem) {
+        const shapeName = shapeItem.dataset.shape;
+        if (window.wb) {
+            window.wb.currentShape = shapeName;
+            window.wb.toolManager.currentTool = 'shape';
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('shape-tool-btn').classList.add('active');
+            document.querySelectorAll('.shape-item').forEach(s => s.classList.remove('active'));
+            shapeItem.classList.add('active');
+        }
+        return;
+    }
+});
+
+// ========== 画笔弹出框 ==========
+let _brushPanelPos = null;
+function toggleBrushPanel() {
+    const panel = document.getElementById('brush-panel');
+    if (panel.classList.contains('show')) {
+        panel.classList.remove('show');
+        return;
+    }
+    // 定位到🖌️按钮右侧
+    const btn = document.getElementById('brush-tool-btn');
+    const btnRect = btn.getBoundingClientRect();
+    if (!_brushPanelPos) {
+        panel.style.left = (btnRect.right + 6) + 'px';
+        panel.style.top = btnRect.top + 'px';
+    } else {
+        panel.style.left = _brushPanelPos.x + 'px';
+        panel.style.top = _brushPanelPos.y + 'px';
+    }
+    panel.classList.add('show');
+}
+
+function closeBrushPanel() {
+    const panel = document.getElementById('brush-panel');
+    if (panel) panel.classList.remove('show');
+}
+
+// X 关闭按钮
+document.getElementById('brush-dialog-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeBrushPanel();
+});
+
+// 拖拽画笔弹出框
+(function() {
+    const header = document.getElementById('brush-dialog-header');
+    const panel = document.getElementById('brush-panel');
+    let dragging = false, startX, startY, origLeft, origTop;
+
+    header.addEventListener('mousedown', function(e) {
+        if (e.target.closest('.brush-dialog-close')) return;
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origLeft = parseInt(panel.style.left) || 80;
+        origTop = parseInt(panel.style.top) || 50;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!dragging) return;
+        const x = origLeft + (e.clientX - startX);
+        const y = origTop + (e.clientY - startY);
+        panel.style.left = x + 'px';
+        panel.style.top = y + 'px';
+        _brushPanelPos = { x, y };
+    });
+
+    document.addEventListener('mouseup', function() {
+        dragging = false;
+    });
+})();
+
+// 选择画笔 — 不关闭弹出框
+document.addEventListener('click', function(e) {
+    const brushItem = e.target.closest('.brush-item');
+    if (brushItem) {
+        const brushName = brushItem.dataset.brush;
+        if (window.wb) {
+            window.wb.currentBrush = brushName;
+            window.wb.toolManager.currentTool = 'brush';
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('brush-tool-btn').classList.add('active');
+            document.querySelectorAll('.brush-item').forEach(s => s.classList.remove('active'));
+            brushItem.classList.add('active');
+        }
+        return;
+    }
+});
+
+// 导出图片
+function exportAs(format) {
+    if (window.wb) window.wb.exportImage(format);
+    closeExportMenu();
+}
+
+function toggleExportMenu() {
+    const menu = document.getElementById('export-menu');
+    menu.classList.toggle('show');
+}
+
+function closeExportMenu() {
+    const menu = document.getElementById('export-menu');
+    if (menu) menu.classList.remove('show');
+}
+
+// 点击其他区域关闭导出菜单
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.export-dropdown')) {
+        closeExportMenu();
+    }
+});
+
+// ========== 缩放控制 ==========
+document.getElementById('zoom-in-btn').addEventListener('click', function() {
+    if (window.wb) window.wb.zoomIn();
+});
+document.getElementById('zoom-out-btn').addEventListener('click', function() {
+    if (window.wb) window.wb.zoomOut();
+});
+document.getElementById('zoom-reset-btn').addEventListener('click', function() {
+    if (window.wb) window.wb.zoomReset();
+});
+
+// ========== 右键上下文菜单事件 ==========
+(function() {
+    const menu = document.getElementById('context-menu');
+    if (!menu) return;
+
+    // 点击菜单项
+    menu.addEventListener('click', function(e) {
+        const item = e.target.closest('.cm-item');
+        if (!item) return;
+        const action = item.dataset.action;
+        if (!action) return; // 有子菜单的父项不处理
+
+        if (!window.wb) return;
+
+        switch (action) {
+            case 'copy':
+                window.wb.copySelected();
+                break;
+            case 'paste':
+                window.wb.pasteClipboard();
+                break;
+            case 'delete':
+                window.wb.batchDelete();
+                break;
+            case 'rotate-right90':
+                window.wb.rotateSelected(90);
+                break;
+            case 'rotate-left90':
+                window.wb.rotateSelected(-90);
+                break;
+            case 'rotate-180':
+                window.wb.rotateSelected(180);
+                break;
+            case 'rotate-custom':
+                window.wb.startCustomRotate();
+                break;
+            case 'flip-h':
+                window.wb.flipSelected('h');
+                break;
+            case 'flip-v':
+                window.wb.flipSelected('v');
+                break;
+            case 'border-solid':
+                window.wb.setBorderSelected('solid');
+                break;
+            case 'border-dashed':
+                window.wb.setBorderSelected('dashed');
+                break;
+            case 'border-none':
+                window.wb.setBorderSelected('none');
+                break;
+        }
+
+        // 执行后关闭菜单
+        window.wb._hideContextMenu();
+    });
+
+    // 点击画布空白区域关闭菜单
+    document.getElementById('canvas-container').addEventListener('mousedown', function(e) {
+        if (e.button === 0 && menu.classList.contains('show')) {
+            window.wb._hideContextMenu();
+        }
+    });
+
+    // 点击其他区域也关闭
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.context-menu') && menu.classList.contains('show')) {
+            window.wb._hideContextMenu();
+        }
+    });
+})();
+</script>
+{% endblock %}

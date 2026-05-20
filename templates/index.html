@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}在线白板 - 首页{% endblock %}
+
+{% block content %}
+<div class="container home-container">
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <div class="hero">
+        <h1>在线白板协作</h1>
+        <p>创建或加入一个房间，开始实时协作绘图</p>
+    </div>
+
+    <div class="home-actions">
+        <div class="action-card">
+            <h3>🆕 创建房间</h3>
+            <div class="form-group">
+                <input type="text" id="room-name" placeholder="房间名称（可选）" maxlength="50">
+            </div>
+            <button onclick="createRoom()" class="btn btn-primary btn-block">创建房间</button>
+        </div>
+
+        <div class="action-card">
+            <h3>🚪 加入房间</h3>
+            <div class="form-group">
+                <input type="text" id="room-id-input" placeholder="输入房间ID" maxlength="8">
+            </div>
+            <button onclick="joinRoom()" class="btn btn-primary btn-block">加入房间</button>
+        </div>
+    </div>
+
+    {% if not user %}
+    <div class="anonymous-hint">
+        💡 注册用户可保存白板内容，<a href="/register">立即注册</a>
+    </div>
+    {% endif %}
+
+    {% if user %}
+    <div class="my-rooms" id="my-rooms">
+        <h3>📁 我的房间</h3>
+        <div id="room-list" class="room-list">
+            <p class="loading-text">加载中...</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+async function createRoom() {
+    const name = document.getElementById('room-name').value.trim();
+    try {
+        const res = await fetch('/api/rooms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name || '未命名房间' })
+        });
+        const data = await res.json();
+        if (data.code === 'SUCCESS') {
+            window.location.href = '/room/' + data.data.id;
+        } else {
+            showToast(data.message);
+        }
+    } catch (e) {
+        showToast('创建房间失败');
+    }
+}
+
+function joinRoom() {
+    const roomId = document.getElementById('room-id-input').value.trim();
+    if (!roomId) {
+        showToast('请输入房间ID');
+        return;
+    }
+    window.location.href = '/room/' + roomId;
+}
+
+{% if user %}
+async function loadMyRooms() {
+    try {
+        const res = await fetch('/api/rooms');
+        const data = await res.json();
+        const listEl = document.getElementById('room-list');
+        if (data.code === 'SUCCESS' && data.data.length > 0) {
+            listEl.innerHTML = data.data.map(room => `
+                <a href="/room/${room.id}" class="room-item">
+                    <span class="room-name">${room.name}</span>
+                    <span class="room-online">🟢 ${room.online_count}人在线</span>
+                </a>
+            `).join('');
+        } else {
+            listEl.innerHTML = '<p class="empty-text">暂无房间</p>';
+        }
+    } catch (e) {
+        document.getElementById('room-list').innerHTML = '<p class="empty-text">加载失败</p>';
+    }
+}
+loadMyRooms();
+{% endif %}
+</script>
+{% endblock %}

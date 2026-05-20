@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database
+instance/
+*.db
+
+# Exports (generated at runtime)
+exports/
+
+# Environment variables
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# WorkBuddy
+.workbuddy/
+
+# Test
+test_*.py

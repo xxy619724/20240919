@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}在线白板{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/" class="logo">🎨 在线白板</a>
+        </div>
+        <div class="nav-right">
+            {% if user %}
+                <span class="user-info">👤 {{ user.username }}</span>
+                <button onclick="logout()" class="btn btn-outline">登出</button>
+            {% else %}
+                <a href="/login" class="btn btn-outline">登录</a>
+                <a href="/register" class="btn btn-primary">注册</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div id="toast" class="toast hidden"></div>
+
+    {% block content %}{% endblock %}
+
+    <script src="{{ url_for('static', filename='js/main.js', v=2) }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
